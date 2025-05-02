@@ -33,3 +33,61 @@ and the jth number of line i is Sij. Sii is always 0, and the remaining Sij is a
 Output
 On the first line, output the minimum value of the difference between the ability values of the start team and the link team.
 */
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+
+int N;
+int S[20][20];
+bool selected[20];
+int min_diff = 1e9;
+
+void calculate() {
+    vector<int> start, link;
+    for (int i = 0; i < N; ++i) {
+        if (selected[i]) start.push_back(i);
+        else link.push_back(i);
+    }
+
+    int start_sum = 0, link_sum = 0;
+
+    for (int i = 0; i < N / 2; ++i) {
+        for (int j = 0; j < N / 2; ++j) {
+            if (i == j) continue;
+            start_sum += S[start[i]][start[j]];
+            link_sum += S[link[i]][link[j]];
+        }
+    }
+
+    int diff = abs(start_sum - link_sum);
+    min_diff = min(min_diff, diff);
+}
+
+void dfs(int idx, int count) {
+    if (count == N / 2) {
+        calculate();
+        return;
+    }
+
+    for (int i = idx; i < N; ++i) {
+        if (!selected[i]) {
+            selected[i] = true;
+            dfs(i + 1, count + 1);
+            selected[i] = false;
+        }
+    }
+}
+
+int main() {
+    cin >> N;
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < N; ++j)
+            cin >> S[i][j];
+
+    dfs(0, 0);
+    cout << min_diff << '\n';
+    return 0;
+}
